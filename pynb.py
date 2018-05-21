@@ -132,7 +132,7 @@ echo "ssh -R %s:localhost:%s %s -f -nNT;" >> jupyternb.sbatch
 echo "ml python_anaconda;" >> jupyternb.sbatch
 echo "echo \\\"c.NotebookApp.password = u'%s'\\\" > .jupyter/slurm_config.py" >> jupyternb.sbatch
 echo "jupyter notebook --no-browser --config=~/.jupyter/slurm_config.py" >> jupyternb.sbatch
-""" % (remote[1], port, remote_host, pwd))
+""" % (remote[1], remote_port, remote_host, pwd))
 
     time.sleep(1)
     stdin, stdout, stderr = client.exec_command("""sbatch -p tgac-short --mem 32G -c 8 jupyternb.sbatch""")
