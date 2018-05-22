@@ -120,7 +120,8 @@ def main():
     except KeyboardInterrupt:
         print 'C-c: Port forwarding stopped.'
         sys.exit(0)
-
+    print server
+    print remote
     pwd = raw_input("Introduce a password to protect the notebook: ")
     pwd = passwd(pwd)
     client.exec_command("""
@@ -128,11 +129,11 @@ echo "#!/bin/bash" > jupyternb.sbatch
 echo "#SBATCH -p tgac-short" >> jupyternb.sbatch
 echo "source /tgac/software/testing/bin/lmod-6.1;" >> jupyternb.sbatch
 echo "hostname;" >> jupyternb.sbatch
-echo "ssh -R %s:localhost:%s %s -f -nNT;" >> jupyternb.sbatch
+echo "ssh -R %s:localhost:8888 %s -f -nNT;" >> jupyternb.sbatch
 echo "ml python_anaconda;" >> jupyternb.sbatch
 echo "echo \\\"c.NotebookApp.password = u'%s'\\\" > .jupyter/slurm_config.py" >> jupyternb.sbatch
 echo "jupyter notebook --no-browser --config=~/.jupyter/slurm_config.py" >> jupyternb.sbatch
-""" % (remote[1], remote_port, remote_host, pwd))
+""" % (remote[1], server[0], pwd))
 
     time.sleep(1)
     stdin, stdout, stderr = client.exec_command("""sbatch -p tgac-short --mem 32G -c 8 jupyternb.sbatch""")
@@ -141,7 +142,7 @@ echo "jupyter notebook --no-browser --config=~/.jupyter/slurm_config.py" >> jupy
     jobid = job_info[0].split(' ')[3]
     # Here capture the stdout of the job and check that the notebook has started, print the status to the log (queue status)
     time.sleep(10)
-    webbrowser.open("http://localhost:%s" % (port))
+    webbrowser.open("http://localhost:%s" % (options.port))
     try:
         while True:
             time.sleep(1)
